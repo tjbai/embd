@@ -129,10 +129,27 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("term")
     parser.add_argument("year")
-    parser.add_argument("limit", default=None)
+    parser.add_argument("--limit", default=None)
+    parser.add_argument("--load", action="store_true")
     args = parser.parse_args()
 
-    courses = rip(args.term, args.year, limit=int(args.limit))
+    if args.load:
+        course_fin = open(f"pickles/{args.term}_{args.year}.pkl", "rb")
+        embd_fin = open(f"pickles/{args.term}_{args.year}_embd.pkl", "rb")
+
+        courses = pickle.load(course_fin)
+        embeddings = pickle.load(embd_fin)
+        assert len(courses) == len(embeddings)
+
+        unpack(courses, embeddings)
+
+        course_fin.close()
+        embd_fin.close()
+        exit(0)
+
+    courses = rip(
+        args.term, args.year, limit=int(args.limit) if args.limit is not None else None
+    )
     print(f"\n>>> pulled all courses {datetime.now()}")
     with open(f"pickles/{args.term}_{args.year}.pkl", "wb") as fout:
         pickle.dump(courses, fout)

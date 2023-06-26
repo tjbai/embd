@@ -32,7 +32,6 @@ def test_index():
         "I want to learn about mathematics and engineering",
     ]
     query_embds = compute_query_embeddings(sentences)
-    exit(1)
     u = AnnoyIndex(len(query_embds[0]), "dot")
     u.load("test.ann")
 

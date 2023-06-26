@@ -1,1 +1,4 @@
 rip/secret.py
+rip/__pycache__/**
+rip/pickles/**
+gen.db
