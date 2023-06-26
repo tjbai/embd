@@ -1,41 +1,30 @@
-import json
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict, List, Tuple
 
 from annoy import AnnoyIndex
-from sentence_transformers import CrossEncoder
-from tqdm import tqdm
+from sentence_transformers import SentenceTransformer, CrossEncoder
 
-from db import DB
-from main import compute_query_embeddings, Course
+from models import DB, Course
 
-INDEX_TREES = 10
+MODEL = SentenceTransformer("msmarco-distilbert-base-tas-b")
+MODEL.max_seq_length = 256
+DB_PATH = "../../gen.db"
+INDEX_PATH = "../../rip/test.ann"
 
 
-def gen_index():
-    with DB("../gen.db") as db:
-        rows = db.execute(
-            """
-        SELECT id, embedding FROM Courses 
-        """
-        )
+def compute_course_embeddings(courses: List[Course]) -> List[List[int]]:
+    descriptions = [f"{course.title}\n\n{course.description}" for course in courses]
+    print("\n")
+    return MODEL.encode(descriptions, show_progress_bar=True).tolist()
 
-        embeddings = [json.loads(r[1]) for r in rows]
-        indices = [int(r[0]) for r in rows]
 
-        t = AnnoyIndex(len(embeddings[0]), "dot")
-        for index, embedding in tqdm(zip(indices, embeddings)):
-            t.add_item(index, embedding)
-
-        print(f"\n>>> built index {datetime.now()}")
-
-        t.build(INDEX_TREES)
-        t.save("test.ann")
+def compute_query_embeddings(queries: List[str]) -> List[List[int]]:
+    return MODEL.encode(queries).tolist()
 
 
 def create_hit_map(ids: List[int]) -> Dict[int, Course]:
     str_ids = [str(id) for id in ids]
-    with DB("../gen.db") as db:
+    with DB(DB_PATH) as db:
         rows = db.execute(
             f"""
             SELECT * 
@@ -52,7 +41,7 @@ def semantic_search(prompts: List[str]) -> List[Dict[int, Course]]:
     print(f"\n>>> calculated query embeddings {datetime.now()}")
 
     u = AnnoyIndex(len(query_embds[0]), "dot")
-    u.load("test.ann")
+    u.load(INDEX_PATH)
 
     hit_maps = []
     for query_embedding in query_embds:
@@ -62,11 +51,7 @@ def semantic_search(prompts: List[str]) -> List[Dict[int, Course]]:
     return hit_maps
 
 
-def lexical_search(prompts: List[str]):
-    pass
-
-
-def retrieve_rerank(prompts: List[str]):
+def retrieve_rerank(prompts: List[str]) -> List[Tuple[int, Course]]:
     cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L-2")
     semantic_cands: List[Dict[int, Course]] = semantic_search(prompts)
     print(f"\n>>> retrieved hits {datetime.now()}")
@@ -86,10 +71,5 @@ def retrieve_rerank(prompts: List[str]):
 
 
 if __name__ == "__main__":
-    prompts = [
-        "What is a good course on modern feminism, the suffrage movement, and underrepresented minorities?",
-        "Feminism, suffrage, minorities, marginalization, history, literature",
-        "Show me courses on feminism and suffrage",
-    ]
-
-    hits = retrieve_rerank(prompts)
+    hits = retrieve_rerank(["Feminism, suffrage movement, etc."])
+    print(hits)
