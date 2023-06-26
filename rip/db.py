@@ -24,8 +24,3 @@ class DB:
         DELETE FROM Courses
         """
         )
-
-
-if __name__ == "__main__":
-    with DB("../gen.db") as db:
-        db.reset()

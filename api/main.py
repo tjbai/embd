@@ -25,7 +25,7 @@ def search(q: str = None):
     courses = retrieve_rerank([q])[0]
     end_t = datetime.now()
 
-    return {"Courses": courses, "Time": end_t - start_t}
+    return {"Time": end_t - start_t, "Courses": courses}
 
 
 @app.get("/quick-search/")
@@ -33,4 +33,8 @@ def quick_search(q: str = None):
     if q is None:
         return {"Error": "Query not provided"}
 
-    return quick_retrieve(q)
+    start_t = datetime.now()
+    courses = quick_retrieve(q)
+    end_t = datetime.now()
+
+    return {"Time": end_t - start_t, "Courses": courses}

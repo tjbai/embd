@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from typing import List, Dict
+import argparse
 
 from annoy import AnnoyIndex
 from sentence_transformers import CrossEncoder
@@ -12,8 +13,8 @@ from main import compute_query_embeddings, Course
 INDEX_TREES = 10
 
 
-def gen_index():
-    with DB("../gen.db") as db:
+def gen_index(file_name: str):
+    with DB("./gen.db") as db:
         rows = db.execute(
             """
         SELECT id, embedding FROM Courses 
@@ -30,7 +31,7 @@ def gen_index():
         print(f"\n>>> built index {datetime.now()}")
 
         t.build(INDEX_TREES)
-        t.save("test.ann")
+        t.save(file_name)
 
 
 def create_hit_map(ids: List[int]) -> Dict[int, Course]:
@@ -86,10 +87,7 @@ def retrieve_rerank(prompts: List[str]):
 
 
 if __name__ == "__main__":
-    prompts = [
-        "What is a good course on modern feminism, the suffrage movement, and underrepresented minorities?",
-        "Feminism, suffrage, minorities, marginalization, history, literature",
-        "Show me courses on feminism and suffrage",
-    ]
-
-    hits = retrieve_rerank(prompts)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("fname")
+    args = parser.parse_args()
+    gen_index(args.fname)

@@ -12,6 +12,7 @@ DB_PATH = "./lib/gen.db"
 INDEX_PATH = "./lib/test.ann"
 
 CANDIDATE_POOL_SIZE = 100
+QUICK_SEARCH_POOL_SIZE = 20
 
 
 def compute_course_embeddings(courses: List[Course]) -> List[List[int]]:
@@ -53,23 +54,6 @@ def semantic_search(prompts: List[str]) -> List[Dict[int, Course]]:
     return hit_maps
 
 
-# def retrieve(prompts: List[str]) -> List[Tuple[int, Course]]:
-#     query_embds = compute_query_embeddings(prompts)
-#     print(f"\n>>> calcualted query embeddings {datetime.now()}")
-
-#     u = AnnoyIndex(len(query_embds[0]), "dot")
-#     u.load(INDEX_PATH)
-
-#     id_lists = [
-#         u.get_nns_by_vector(query_embedding, QUICK_POOL_SIZE)
-#         for query_embedding in query_embds
-#     ]
-
-#     id_lists_strs = [", ".join(str(num) for num in sublist) for sublist in id_lists]
-#     with DB(DB_PATH) as db:
-#         rows = db.execute()
-
-
 def retrieve_rerank(prompts: List[str]) -> List[List[Tuple[int, Course]]]:
     cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L-2")
     semantic_cands: List[Dict[int, Course]] = semantic_search(prompts)
@@ -86,7 +70,9 @@ def retrieve_rerank(prompts: List[str]) -> List[List[Tuple[int, Course]]]:
         res.append(sorted(hits_with_scores, reverse=True))
 
     print(f"\n>>> cross evaluated hits {datetime.now()}")
-    return [[(tup[1], tup[2]) for tup in hit_list] for hit_list in res]
+    return [[(tup[1], tup[2]) for tup in hit_list] for hit_list in res][
+        :QUICK_SEARCH_POOL_SIZE
+    ]
 
 
 def quick_retrieve(prompt: str) -> List[Tuple[int, Course]]:
@@ -95,7 +81,9 @@ def quick_retrieve(prompt: str) -> List[Tuple[int, Course]]:
     u = AnnoyIndex(len(query_embedding), "dot")
     u.load(INDEX_PATH)
 
-    ids, distances = u.get_nns_by_vector(query_embedding, CANDIDATE_POOL_SIZE)
+    ids, distances = u.get_nns_by_vector(
+        query_embedding, QUICK_SEARCH_POOL_SIZE, include_distances=True
+    )
     id_to_dist = {id: dist for id, dist in zip(ids, distances)}
 
     with DB(DB_PATH) as db:
@@ -103,10 +91,9 @@ def quick_retrieve(prompt: str) -> List[Tuple[int, Course]]:
             f"""
             SELECT *
             FROM Courses
-            WHERE id IN ({[str(id) for id in ids]})
+            WHERE id IN ({', '.join([str(id) for id in ids])})
         """
         )
 
     res.sort(key=lambda x: id_to_dist[x[0]])
-
-    return None
+    return [(tup[0], Course(*tup[1:-1])) for tup in res]
