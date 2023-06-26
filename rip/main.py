@@ -18,16 +18,16 @@ API_BASE = "https://sis.jhu.edu/api"
 
 @dataclass
 class Course:
-    term: str
-    yr: int
-    title: str
-    description: str
-    departments: str
-    instructors: str
-    school: str
-    writing_intensive: bool
-    credits: str
-    areas: str
+    term: str = None
+    yr: int = None
+    title: str = None
+    description: str = None
+    departments: str = None
+    instructors: str = None
+    school: str = None
+    writing_intensive: bool = None
+    credits: str = None
+    areas: str = None
 
 
 def rip(term: str, yr: int, limit: int = None) -> List[Course]:
@@ -85,12 +85,13 @@ def rip(term: str, yr: int, limit: int = None) -> List[Course]:
 
 
 MODEL = SentenceTransformer("msmarco-distilbert-base-tas-b")
-MODEL.max_seq_length = 200
+MODEL.max_seq_length = 256
 
 
 def compute_course_embeddings(courses: List[Course]) -> List[List[int]]:
     descriptions = [f"{course.title}\n\n{course.description}" for course in courses]
-    return MODEL.encode(descriptions).tolist()
+    print("\n")
+    return MODEL.encode(descriptions, show_progress_bar=True).tolist()
 
 
 def compute_query_embeddings(queries: List[str]) -> List[List[int]]:
