@@ -99,7 +99,7 @@ def compute_query_embeddings(queries: List[str]) -> List[List[int]]:
 
 
 def unpack(courses, embeddings):
-    with DB("../gen.db") as db:
+    with DB("./gen.db") as db:
         for course, embedding in zip(courses, embeddings):
             db.execute(
                 """
@@ -132,7 +132,17 @@ def main():
     parser.add_argument("year")
     parser.add_argument("--limit", default=None)
     parser.add_argument("--load", action="store_true")
+    parser.add_argument('--embd', action='store_true')
     args = parser.parse_args()
+
+    if args.embd:
+        with open(f'pickles/{args.term}_{args.year}.pkl', 'rb') as fin:
+            courses = pickle.load(fin)
+
+            embeddings = compute_course_embeddings(courses)
+            print(f"\n>>> computed embeddings {datetime.now()}")
+            with open(f"pickles/{args.term}_{args.year}_embd.pkl", "wb") as fout:
+                pickle.dump(embeddings, fout)
 
     if args.load:
         course_fin = open(f"pickles/{args.term}_{args.year}.pkl", "rb")
@@ -146,19 +156,19 @@ def main():
 
         course_fin.close()
         embd_fin.close()
-        exit(0)
 
-    courses = rip(
-        args.term, args.year, limit=int(args.limit) if args.limit is not None else None
-    )
-    print(f"\n>>> pulled all courses {datetime.now()}")
-    with open(f"pickles/{args.term}_{args.year}.pkl", "wb") as fout:
-        pickle.dump(courses, fout)
+    if not args.embd and not args.load:
+        courses = rip(
+            args.term, args.year, limit=int(args.limit) if args.limit is not None else None
+        )
+        print(f"\n>>> pulled all courses {datetime.now()}")
+        with open(f"pickles/{args.term}_{args.year}.pkl", "wb") as fout:
+            pickle.dump(courses, fout)
 
-    embeddings = compute_course_embeddings(courses)
-    print(f"\n>>> computed embeddings {datetime.now()}")
-    with open(f"pickles/{args.term}_{args.year}_embd.pkl", "wb") as fout:
-        pickle.dump(embeddings, fout)
+        embeddings = compute_course_embeddings(courses)
+        print(f"\n>>> computed embeddings {datetime.now()}")
+        with open(f"pickles/{args.term}_{args.year}_embd.pkl", "wb") as fout:
+            pickle.dump(embeddings, fout)
 
 
 if __name__ == "__main__":
