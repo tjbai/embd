@@ -115,12 +115,18 @@ def unpack(courses, embeddings):
         print(f"\n>>> inserted courses {datetime.now()}\n")
 
 
+THRESHOLD = 10
 def squash():
     with DB('./gen.db') as db:
         db.execute('''DELETE FROM CourseWrappers''')
         db.conn.commit()
 
-        courses = db.execute('''SELECT * FROM Courses''')
+        courses = db.execute(
+            f'''
+            SELECT * FROM Courses
+            WHERE LENGTH(description) - LENGTH(REPLACE(description, ' ', '')) + 1 > {THRESHOLD}
+            '''
+        )
 
         # sanitize whitespace characters
         sanitized_courses = []
