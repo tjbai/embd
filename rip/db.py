@@ -21,6 +21,31 @@ class DB:
     def reset(self):
         self.execute(
             """
-        DELETE FROM Courses
+        DROP TABLE Courses
+        """
+        )
+
+
+if __name__ == "__main__":
+    with DB("./gen.db") as db:
+        db.reset()
+        db.conn.commit()
+
+        db.execute(
+            """
+        CREATE TABLE Courses (
+            id INTEGER PRIMARY KEY,
+            term TEXT,
+            year INTEGER,
+            title TEXT,
+            description TEXT,
+            departments TEXT,
+            instructors TEXT,
+            school TEXT,
+            writing_intensive BOOLEAN,
+            credits TEXT,
+            areas TEXT,
+            embedding TEXT
+        )
         """
         )

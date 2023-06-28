@@ -10,28 +10,36 @@ from tqdm import tqdm
 from db import DB
 from main import compute_query_embeddings, Course
 
-INDEX_TREES = 10
+INDEX_TREES = 100
+THRESHOLD = 10
 
 
 def gen_index(file_name: str):
     with DB("./gen.db") as db:
         rows = db.execute(
-            """
+            f"""
         SELECT id, embedding FROM Courses 
+        WHERE LENGTH(description) - LENGTH(REPLACE(description, ' ', '')) + 1 > {THRESHOLD}
         """
         )
 
         embeddings = [json.loads(r[1]) for r in rows]
-        indices = [int(r[0]) for r in rows]
+        ids = [int(r[0]) for r in rows]
 
         t = AnnoyIndex(len(embeddings[0]), "dot")
-        for index, embedding in tqdm(zip(indices, embeddings)):
-            t.add_item(index, embedding)
+        for id, embedding in tqdm(zip(ids, embeddings)):
+            t.add_item(id, embedding)
+        print(f"\n>>> added all items {datetime.now()}")
 
-        print(f"\n>>> built index {datetime.now()}")
-
+        build_start_t = datetime.now()
         t.build(INDEX_TREES)
-        t.save(file_name)
+        built_end_t = datetime.now()
+        print(
+            f">>> built index with {INDEX_TREES}"
+            f" trees in {built_end_t - build_start_t}"
+        )
+
+        t.save(f"{file_name}.ann")
 
 
 def create_hit_map(ids: List[int]) -> Dict[int, Course]:

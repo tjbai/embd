@@ -18,16 +18,16 @@ API_BASE = "https://sis.jhu.edu/api"
 
 @dataclass
 class Course:
-    term: str = None
-    yr: int = None
-    title: str = None
-    description: str = None
-    departments: str = None
-    instructors: str = None
-    school: str = None
-    writing_intensive: bool = None
-    credits: str = None
-    areas: str = None
+    term: str
+    yr: int
+    title: str
+    description: str
+    departments: str
+    instructors: str
+    school: str
+    writing_intensive: bool
+    credits: str
+    areas: str
 
 
 def rip(term: str, yr: int, limit: int = None) -> List[Course]:
@@ -100,7 +100,7 @@ def compute_query_embeddings(queries: List[str]) -> List[List[int]]:
 
 def unpack(courses, embeddings):
     with DB("./gen.db") as db:
-        for course, embedding in zip(courses, embeddings):
+        for course, embedding in tqdm(zip(courses, embeddings)):
             db.execute(
                 """
                 INSERT INTO Courses
@@ -123,7 +123,7 @@ def unpack(courses, embeddings):
                     json.dumps(list(embedding)),
                 ),
             )
-        print(f"\n>>> inserted courses {datetime.now()}")
+        print(f"\n>>> inserted courses {datetime.now()}\n")
 
 
 def main():
