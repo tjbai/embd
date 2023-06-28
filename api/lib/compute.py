@@ -4,12 +4,12 @@ from typing import Dict, List, Tuple
 from annoy import AnnoyIndex
 from sentence_transformers import SentenceTransformer, CrossEncoder
 
-from lib.models import DB, Course
+from lib.models import DB, Course, CourseWrapper
 
 MODEL = SentenceTransformer("msmarco-distilbert-base-tas-b")
 MODEL.max_seq_length = 256
 DB_PATH = "./lib/gen.db"
-INDEX_PATH = "./lib/test.ann"
+INDEX_PATH = "./lib/v1_squashed.ann"
 
 CANDIDATE_POOL_SIZE = 100
 QUICK_SEARCH_POOL_SIZE = 20
@@ -25,21 +25,21 @@ def compute_query_embeddings(queries: List[str]) -> List[List[int]]:
     return MODEL.encode(queries).tolist()
 
 
-def create_hit_map(ids: List[int]) -> Dict[int, Course]:
+def create_hit_map(ids: List[int]) -> Dict[int, CourseWrapper]:
     str_ids = [str(id) for id in ids]
     with DB(DB_PATH) as db:
         rows = db.execute(
             f"""
             SELECT * 
-            FROM Courses
+            FROM CourseWrappers
             WHERE id in ({', '.join(str_ids)})
         """
         )
 
-    return {row[0]: Course(*(row[1:-1])) for row in rows}
+    return {row[0]: CourseWrapper(*(row[1:-1])) for row in rows}
 
 
-def semantic_search(prompts: List[str]) -> List[Dict[int, Course]]:
+def semantic_search(prompts: List[str]) -> List[Dict[int, CourseWrapper]]:
     query_embds = compute_query_embeddings(prompts)
     print(f"\n>>> calculated query embeddings {datetime.now()}")
 
@@ -54,9 +54,9 @@ def semantic_search(prompts: List[str]) -> List[Dict[int, Course]]:
     return hit_maps
 
 
-def retrieve_rerank(prompts: List[str]) -> List[List[Tuple[int, Course]]]:
+def retrieve_rerank(prompts: List[str]) -> List[List[Tuple[int, CourseWrapper]]]:
     cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L-2")
-    semantic_cands: List[Dict[int, Course]] = semantic_search(prompts)
+    semantic_cands: List[Dict[int, CourseWrapper]] = semantic_search(prompts)
     print(f"\n>>> retrieved hits {datetime.now()}")
 
     res = []
@@ -70,9 +70,7 @@ def retrieve_rerank(prompts: List[str]) -> List[List[Tuple[int, Course]]]:
         res.append(sorted(hits_with_scores, reverse=True))
 
     print(f"\n>>> cross evaluated hits {datetime.now()}")
-    return [[(tup[1], tup[2]) for tup in hit_list] for hit_list in res][
-        :QUICK_SEARCH_POOL_SIZE
-    ]
+    return [[(tup[1], tup[2]) for tup in hit_list] for hit_list in res]
 
 
 def quick_retrieve(prompt: str) -> List[Tuple[int, Course]]:

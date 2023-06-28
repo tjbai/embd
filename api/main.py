@@ -25,7 +25,10 @@ def search(q: str = None):
     courses = retrieve_rerank([q])[0]
     end_t = datetime.now()
 
-    return {"Time": end_t - start_t, "Courses": courses}
+    return {
+        "time": end_t - start_t,
+        "courses": [{"id": tup[0], "course": tup[1]} for tup in courses],
+    }
 
 
 @app.get("/quick-search/")
@@ -37,4 +40,7 @@ def quick_search(q: str = None):
     courses = quick_retrieve(q)
     end_t = datetime.now()
 
-    return {"Time": end_t - start_t, "Courses": courses}
+    return {
+        "time": end_t - start_t,
+        "courses": [{"id": tup[0], "course": tup[1]} for tup in courses],
+    }

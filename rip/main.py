@@ -1,7 +1,6 @@
 import argparse
 import json
 import pickle
-from dataclasses import dataclass
 from datetime import datetime
 from typing import List
 
@@ -10,24 +9,13 @@ from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
 from db import DB
+from models import Course, CourseWrapper, Semester
 from secret import API_KEY
 
 SCHOOLS = ["Krieger School of Arts and Sciences", "Whiting School of Engineering"]
 API_BASE = "https://sis.jhu.edu/api"
+THRESHOLD = 10
 
-
-@dataclass
-class Course:
-    term: str
-    yr: int
-    title: str
-    description: str
-    departments: str
-    instructors: str
-    school: str
-    writing_intensive: bool
-    credits: str
-    areas: str
 
 
 def rip(term: str, yr: int, limit: int = None) -> List[Course]:
@@ -108,7 +96,7 @@ def unpack(courses, embeddings):
                     school, writing_intensive, credits, areas, embedding)
                 VALUES
                     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
+                """,
                 params=(
                     course.term,
                     course.yr,
@@ -125,15 +113,81 @@ def unpack(courses, embeddings):
             )
         print(f"\n>>> inserted courses {datetime.now()}\n")
 
+def squash():
+    with DB('./gen.db') as db:
+        db.execute('''DELETE FROM CourseWrappers''')
+        db.conn.commit()
+
+        courses = db.execute('''SELECT * FROM Courses''')
+
+        # sort by description, then by year, then by semester
+        courses.sort(key=lambda r: (r[4], -r[2], r[1]))
+
+        # walk the courses, "squashing" similar courses
+        course_wrappers: CourseWrapper = []
+        for course in courses:
+            if len(course_wrappers) == 0 or course[4] != course_wrappers[-1].description:
+                course_wrappers.append(
+                    CourseWrapper(
+                        semesters=[], 
+                        title=course[3], 
+                        description=course[4],
+                        departments=course[5],
+                        instructors=course[6],
+                        school=course[7],
+                        writing_intensive=course[8],
+                        credits=course[9],
+                        areas=course[10],
+                        embedding=course[11]
+                    )
+                )
+
+            course_wrappers[-1].semesters.append(
+                Semester(term=course[1], yr=course[2])
+            )
+
+        # insert into CourseWrappers table
+        for course_wrapper in course_wrappers:
+            db.execute(
+                '''
+                INSERT INTO CourseWrappers 
+                (semesters, title, description, departments,
+                instructors, school, writing_intensive,
+                credits, areas, embedding)
+                VALUES 
+                (?,?,?,?,?,?,?,?,?,?)
+                ''',
+                params=(
+                    ', '.join([semester.__str__() for semester in course_wrapper.semesters]),
+                    course_wrapper.title,
+                    course_wrapper.description,
+                    course_wrapper.departments,
+                    course_wrapper.instructors,
+                    course_wrapper.school,
+                    course_wrapper.writing_intensive,
+                    course_wrapper.credits,
+                    course_wrapper.areas,
+                    course_wrapper.embedding
+                )
+            )
+
+        print(f'\n>>> Inserted {len(course_wrappers)} rows')
+
+
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("term")
-    parser.add_argument("year")
+    parser.add_argument("--term", '-t')
+    parser.add_argument("--year", '-y')
     parser.add_argument("--limit", default=None)
     parser.add_argument("--load", action="store_true")
     parser.add_argument('--embd', action='store_true')
+    parser.add_argument('--squash', action='store_true')
     args = parser.parse_args()
+
+    if args.squash: 
+        squash()
+        exit(0)
 
     if args.embd:
         with open(f'pickles/{args.term}_{args.year}.pkl', 'rb') as fin:
@@ -143,6 +197,7 @@ def main():
             print(f"\n>>> computed embeddings {datetime.now()}")
             with open(f"pickles/{args.term}_{args.year}_embd.pkl", "wb") as fout:
                 pickle.dump(embeddings, fout)
+        exit(0)
 
     if args.load:
         course_fin = open(f"pickles/{args.term}_{args.year}.pkl", "rb")
@@ -156,8 +211,9 @@ def main():
 
         course_fin.close()
         embd_fin.close()
+        exit(0)
 
-    if not args.embd and not args.load:
+    if args.year and args.term:
         courses = rip(
             args.term, args.year, limit=int(args.limit) if args.limit is not None else None
         )

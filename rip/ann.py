@@ -42,6 +42,22 @@ def gen_index(file_name: str):
         t.save(f"{file_name}.ann")
 
 
+def gen_squashed_index(file_name: str):
+    with DB("./gen.db") as db:
+        # no threshold because squashed db is small enough
+        rows = db.execute(f"""SELECT id, embedding FROM CourseWrappers""")
+
+        embeddings = [json.loads(r[1]) for r in rows]
+        ids = [int(r[0]) for r in rows]
+
+        t = AnnoyIndex(len(embeddings[0]), "dot")
+        for id, embedding in zip(ids, embeddings):
+            t.add_item(id, embedding)
+
+        t.build(INDEX_TREES)
+        t.save(f"{file_name}_squashed.ann")
+
+
 def create_hit_map(ids: List[int]) -> Dict[int, Course]:
     str_ids = [str(id) for id in ids]
     with DB("../gen.db") as db:
@@ -98,4 +114,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("fname")
     args = parser.parse_args()
-    gen_index(args.fname)
+
+    # gen_index(args.fname)
+    gen_squashed_index(args.fname)

@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
+import axios from "axios";
+import { SearchResponse } from "@/lib/types";
 
-const fetchQueryResults = async () => {
-  return new Promise((res, rej) => {
-    setTimeout(() => {
-      res({});
-    }, 1000);
-  });
+const API_URL = "http://localhost:8000";
+
+const fetchQueryResults = async (query: string) => {
+  const { data } = await axios.get(`${API_URL}/search?q=${query}`);
+  return data as SearchResponse;
 };
 
 export default async function Page({
@@ -16,7 +17,15 @@ export default async function Page({
   const { q } = searchParams;
   if (!q) redirect("/");
 
-  const queryResults = await fetchQueryResults();
+  const queryResults = await fetchQueryResults(q as string);
 
-  return <div>{q}</div>;
+  return (
+    <div>
+      <ul>
+        {queryResults.courses.map((courseWrapper, i) => (
+          <li key={courseWrapper.id}>{i + courseWrapper.course.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }

@@ -4,16 +4,29 @@ import sqlite3
 
 @dataclass
 class Course:
-    term: str = None
-    yr: int = None
-    title: str = None
-    description: str = None
-    departments: str = None
-    instructors: str = None
-    school: str = None
-    writing_intensive: bool = None
-    credits: str = None
-    areas: str = None
+    term: str
+    yr: int
+    title: str
+    description: str
+    departments: str
+    instructors: str
+    school: str
+    writing_intensive: bool
+    credits: str
+    areas: str
+
+
+@dataclass
+class CourseWrapper:
+    semesters: str
+    title: str
+    description: str
+    departments: str
+    instructors: str
+    school: str
+    writing_intensive: bool
+    credits: str
+    areas: str
 
 
 class DB:
