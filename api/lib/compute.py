@@ -9,7 +9,7 @@ from lib.models import DB, Course, CourseWrapper
 MODEL = SentenceTransformer("msmarco-distilbert-base-tas-b")
 MODEL.max_seq_length = 256
 DB_PATH = "./lib/gen.db"
-INDEX_PATH = "./lib/v1_squashed.ann"
+INDEX_PATH = "./lib/resort_squashed.ann"
 
 CANDIDATE_POOL_SIZE = 100
 QUICK_SEARCH_POOL_SIZE = 20

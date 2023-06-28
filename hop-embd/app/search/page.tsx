@@ -23,7 +23,12 @@ export default async function Page({
     <div>
       <ul>
         {queryResults.courses.map((courseWrapper, i) => (
-          <li key={courseWrapper.id}>{i + courseWrapper.course.title}</li>
+          <li key={courseWrapper.id}>
+            <div>{i + courseWrapper.course.title}</div>
+            <div style={{ marginBottom: "20px" }}>
+              {courseWrapper.course.description}
+            </div>
+          </li>
         ))}
       </ul>
     </div>

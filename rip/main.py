@@ -3,6 +3,7 @@ import json
 import pickle
 from datetime import datetime
 from typing import List
+import re
 
 import requests
 from sentence_transformers import SentenceTransformer
@@ -113,6 +114,7 @@ def unpack(courses, embeddings):
             )
         print(f"\n>>> inserted courses {datetime.now()}\n")
 
+
 def squash():
     with DB('./gen.db') as db:
         db.execute('''DELETE FROM CourseWrappers''')
@@ -120,31 +122,49 @@ def squash():
 
         courses = db.execute('''SELECT * FROM Courses''')
 
+        # sanitize whitespace characters
+        sanitized_courses = []
+        for c in courses:
+            des = c[4]
+            des = des.strip()
+            des = re.sub(r'\s', ' ', des)
+            sanitized_tup = tuple(list(c[:4]) + [des] + list(c[5:]))
+            sanitized_courses.append(sanitized_tup)
+
+        courses = sanitized_courses # set anew
+
         # sort by description, then by year, then by semester
-        courses.sort(key=lambda r: (r[4], -r[2], r[1]))
+        courses.sort(key=lambda r: (r[4], r[3], -r[2], r[1]))
 
         # walk the courses, "squashing" similar courses
         course_wrappers: CourseWrapper = []
         for course in courses:
-            if len(course_wrappers) == 0 or course[4] != course_wrappers[-1].description:
-                course_wrappers.append(
-                    CourseWrapper(
-                        semesters=[], 
-                        title=course[3], 
-                        description=course[4],
-                        departments=course[5],
-                        instructors=course[6],
-                        school=course[7],
-                        writing_intensive=course[8],
-                        credits=course[9],
-                        areas=course[10],
-                        embedding=course[11]
+            if (len(course_wrappers) > 0
+                and course[4] == course_wrappers[-1].description
+                and course[3] == course_wrappers[-1].title
+            ):
+                course_wrappers[-1].semesters.append(
+                    Semester(
+                        term=course[1], 
+                        yr=course[2]
                     )
                 )
-
-            course_wrappers[-1].semesters.append(
-                Semester(term=course[1], yr=course[2])
-            )
+            
+            else:
+                course_wrappers.append(
+                        CourseWrapper(
+                            semesters=[Semester(term=course[1], yr=course[2])], 
+                            title=course[3], 
+                            description=course[4],
+                            departments=course[5],
+                            instructors=course[6],
+                            school=course[7],
+                            writing_intensive=course[8],
+                            credits=course[9],
+                            areas=course[10],
+                            embedding=course[11]
+                        )
+                    )
 
         # insert into CourseWrappers table
         for course_wrapper in course_wrappers:
