@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 from annoy import AnnoyIndex
 from sentence_transformers import SentenceTransformer, CrossEncoder
@@ -95,3 +95,19 @@ def quick_retrieve(prompt: str) -> List[Tuple[int, Course]]:
 
     res.sort(key=lambda x: id_to_dist[x[0]])
     return [(tup[0], Course(*tup[1:-1])) for tup in res]
+
+
+def fetch_courses(ids: List[str]) -> Union[List[Course], None]:
+    with DB(DB_PATH) as db:
+        res = db.execute(
+            f"""
+            SELECT *
+            FROM CourseWrappers
+            WHERE id in ({', '.join(ids)})
+            """
+        )
+
+        if len(res) == 0:
+            return None
+
+        return [CourseWrapper(*tup[1:-1]) for tup in res]

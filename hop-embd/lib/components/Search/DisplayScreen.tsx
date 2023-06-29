@@ -1,9 +1,9 @@
-import styles from "./styles.module.css";
-
 import { SearchResponse } from "@/lib/types";
+import PageWrapper from "../Common/PageWrapper";
+import ResultsWrapper from "../Common/ResultsWrapper";
+import Factoid from "./Factoid";
 import QueryItem from "./QueryItem";
 import SearchBar from "./SearchBar";
-import Factoid from "./Factoid";
 
 export default function DisplayScreen({
   query,
@@ -13,16 +13,16 @@ export default function DisplayScreen({
   queryResults: SearchResponse;
 }) {
   return (
-    <section className={styles.pageWrapper}>
-      <div className={styles.resultsWrapper}>
-        <SearchBar />
+    <PageWrapper>
+      <SearchBar />
+      <ResultsWrapper>
         <Factoid queryResults={queryResults} query={query} />
         <ul>
           {queryResults.courses.map((courseWrapper, index) => (
             <QueryItem courseWrapper={courseWrapper} key={courseWrapper.id} />
           ))}
         </ul>
-      </div>
-    </section>
+      </ResultsWrapper>
+    </PageWrapper>
   );
 }

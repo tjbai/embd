@@ -19,3 +19,7 @@ export interface SearchResponse {
   time: number;
   courses: CourseWrapper[];
 }
+
+export interface CoursesResponse {
+  courses: Course[];
+}

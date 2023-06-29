@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import List, Union
+from typing_extensions import Annotated
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 
-from lib.compute import retrieve_rerank, quick_retrieve
+from lib.compute import fetch_courses, quick_retrieve, retrieve_rerank
 
 app = FastAPI()
 
@@ -44,3 +46,14 @@ def quick_search(q: str = None):
         "time": end_t - start_t,
         "courses": [{"id": tup[0], "course": tup[1]} for tup in courses],
     }
+
+
+@app.get("/course")
+def course(ids: Annotated[Union[List[str], None], Query()] = None):
+    print(ids)
+
+    if ids is None:
+        return {"Error": "IDs not provided"}
+
+    courses = fetch_courses(ids)
+    return {"courses": courses}

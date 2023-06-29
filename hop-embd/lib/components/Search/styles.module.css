@@ -102,6 +102,11 @@
 }
 
 @media (max-width: 768px) {
+    .pageWrapper {
+        top: 10%;
+        height: calc(100% - 10%)
+    }
+
     .courseTitle {
         font-size: 20px;
         line-height: 24px;

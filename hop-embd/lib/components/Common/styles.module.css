@@ -1,0 +1,28 @@
+.pageWrapper {
+    --page-top: 15%;
+    position: absolute;
+    top: var(--page-top);
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100% - var(--page-top));
+    align-items: center;
+}
+
+.resultsWrapper {
+    display: flex;
+    flex-direction: column;
+    width: min(90%, 1000px);
+    max-height: 100%;
+    overflow-y: scroll;
+    list-style-type: none;
+}
+
+@media (max-width: 768px) {
+    .pageWrapper {
+        top: 10%;
+        height: calc(100% - 10%)
+    }
+}

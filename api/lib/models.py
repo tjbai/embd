@@ -28,6 +28,10 @@ class CourseWrapper:
     credits: str
     areas: str
 
+@dataclass 
+class CourseQuery:
+    id: str
+
 
 class DB:
     def __init__(self, db_file):

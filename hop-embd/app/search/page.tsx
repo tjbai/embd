@@ -2,10 +2,8 @@ import DisplayScreen from "@/lib/components/Search/DisplayScreen";
 import { redirect } from "next/navigation";
 import { isArray } from "util";
 
-const API_URL = "http://localhost:8000";
-
 const fetchQueryResults = async (query: string) => {
-  const res = await fetch(`${API_URL}/search?q=${query}`);
+  const res = await fetch(`${process.env.API_URL}/search?q=${query}`);
   return res.json();
 };
 
