@@ -1,12 +1,11 @@
+import DisplayScreen from "@/lib/components/Search/DisplayScreen";
 import { redirect } from "next/navigation";
-import axios from "axios";
-import { SearchResponse } from "@/lib/types";
 
 const API_URL = "http://localhost:8000";
 
 const fetchQueryResults = async (query: string) => {
-  const { data } = await axios.get(`${API_URL}/search?q=${query}`);
-  return data as SearchResponse;
+  const res = await fetch(`${API_URL}/search?q=${query}`);
+  return res.json();
 };
 
 export default async function Page({
@@ -19,18 +18,5 @@ export default async function Page({
 
   const queryResults = await fetchQueryResults(q as string);
 
-  return (
-    <div>
-      <ul>
-        {queryResults.courses.map((courseWrapper, i) => (
-          <li key={courseWrapper.id}>
-            <div>{i + courseWrapper.course.title}</div>
-            <div style={{ marginBottom: "20px" }}>
-              {courseWrapper.course.description}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+  return <DisplayScreen queryResults={queryResults} />;
 }

@@ -1,5 +1,6 @@
-import Providers from "@/lib/components/Common/Providers";
 import "./globals.css";
+import Background from "@/lib/components/Common/Background";
+import Providers from "@/lib/components/Common/Providers";
 
 export const metadata = {};
 
@@ -11,7 +12,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Background>{children}</Background>
+        </Providers>
       </body>
     </html>
   );
