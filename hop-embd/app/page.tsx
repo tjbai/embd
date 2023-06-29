@@ -50,7 +50,7 @@ export default function Home() {
 
       <form
         style={{ display: "flex", width: "100%", justifyContent: "center" }}
-        onSubmit={handleSubmit}
+        onSubmit={query.length ? handleSubmit : () => {}}
       >
         <InputGroup maxW={{ base: "70%", md: "min(60%, 900px)" }}>
           <Input
@@ -67,7 +67,7 @@ export default function Home() {
           <InputRightElement
             h={{ base: "40px", md: "50px" }}
             w={{ base: "40px", md: "50px" }}
-            bg={query.length ? "#0072CE" : "#F7FAFC"}
+            bg={query?.length ? "#0072CE" : "transparent"}
             borderRightRadius="5px"
             _hover={{ cursor: query.length ? "pointer" : "auto" }}
             onClick={query.length ? handleMouseSubmit : () => {}}

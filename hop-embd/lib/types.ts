@@ -1,6 +1,5 @@
 export interface Course {
-  term: string;
-  year: number;
+  semesters: string;
   title: string;
   description: string;
   departments: string;

@@ -1,0 +1,127 @@
+.pageWrapper {
+    --page-top: 15%;
+    position: absolute;
+    top: var(--page-top);
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: calc(100% - var(--page-top));
+    align-items: center;
+}
+
+.resultsWrapper {
+    display: flex;
+    flex-direction: column;
+    width: min(90%, 1000px);
+    max-height: 100%;
+    overflow-y: scroll;
+    list-style-type: none;
+}
+
+.queryItemWrapper {
+    border: 1px solid green;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    background-color: transparent;
+    border: 2px solid white;
+    border-radius: 10px;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    transition: 0.25s;
+}
+
+.queryItemWrapper:hover {
+    cursor: pointer;
+    background: rgba(62, 62, 62, 0.75);
+}
+
+.courseTitle {
+    font-size: 30px;
+    line-height: 35px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+    color: lightblue;
+}
+
+.metadataContainer {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.bar {
+    background-color: white;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    margin: 10px;
+}
+
+.metadata {
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 30px;
+}
+
+.factoidWrapper {
+    margin-bottom: 10px;
+    padding-left: 10px;
+}
+
+.factoid {
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.descriptionContainer {
+    max-height: 100px;
+    overflow: hidden;
+}
+
+.description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgb(213, 211, 211);
+    font-size: 20px;
+    line-height: 30px;
+}
+
+@media (max-width: 768px) {
+    .courseTitle {
+        font-size: 20px;
+        line-height: 24px;
+    }
+
+    .metadata {
+        font-size: 17px;
+        line-height: 22px;
+        margin-top: 2px;
+        position: relative;
+        top: 2px;
+    }
+
+    .bar {
+        margin: 5px;
+    }
+
+    .description {
+        margin-top: 2px;
+        font-size: 17px;
+        line-height: 25px;
+    }
+}

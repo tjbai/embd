@@ -1,5 +1,6 @@
 import DisplayScreen from "@/lib/components/Search/DisplayScreen";
 import { redirect } from "next/navigation";
+import { isArray } from "util";
 
 const API_URL = "http://localhost:8000";
 
@@ -14,9 +15,9 @@ export default async function Page({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const { q } = searchParams;
-  if (!q) redirect("/");
+  if (!q || isArray(q)) redirect("/");
 
   const queryResults = await fetchQueryResults(q as string);
 
-  return <DisplayScreen queryResults={queryResults} />;
+  return <DisplayScreen queryResults={queryResults} query={q} />;
 }
