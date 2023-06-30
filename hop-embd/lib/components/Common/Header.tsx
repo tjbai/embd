@@ -1,6 +1,10 @@
 import { Flex, HStack, Icon, Text } from "@chakra-ui/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+  const router = useRouter();
+
   return (
     <Flex
       w="100%"
@@ -18,6 +22,8 @@ export default function Header() {
         fontWeight="bold"
         align="center"
         fontSize={{ base: "15px", md: "18px" }}
+        _hover={{ cursor: "pointer" }}
+        onClick={() => router.push("/")}
       >
         Embedded SIS
       </Flex>
@@ -29,7 +35,7 @@ export default function Header() {
         fontSize={{ base: "12px", md: "15px" }}
       >
         <HStack>
-          <Text>About</Text>
+          <Link href="/about">About</Link>
           <Icon />
         </HStack>
       </Flex>
