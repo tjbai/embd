@@ -11,7 +11,7 @@ export default function Page() {
           answer={
             <>
               <br />
-              <text>{"First, you need to undertand embeddings."}</text>
+              <text>{"First, what are embeddings?"}</text>
               <br />
               <br />
               <text>
@@ -71,12 +71,8 @@ export default function Page() {
               <text>
                 {"The data scraped from SIS is not perfect. Courses sometimes change " +
                   "their description by just a small amount every couple of years, and this can create" +
-                  " duplicate entries in our database."}
-              </text>
-              <br />
-              <br />
-              <text>
-                {"Data cleaning methods that avoid this issue only end up introducing " +
+                  " duplicate entries in our database." +
+                  " Data cleaning methods that avoid this issue only end up introducing " +
                   " news problems, so for now think of it as a feature, not a bug."}
               </text>
             </>

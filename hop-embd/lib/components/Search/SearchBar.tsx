@@ -30,7 +30,7 @@ const labelStyles = {
   fontWeight: "bold",
 };
 
-const defaultFilter = [2016, 2023];
+const defaultFilter = [2017, 2023];
 
 export default function SearchBar({ smaller }: { smaller?: boolean }) {
   const searchParams = useSearchParams();
@@ -174,9 +174,6 @@ export default function SearchBar({ smaller }: { smaller?: boolean }) {
               index={1}
             />
 
-            <RangeSliderMark value={2016} {...labelStyles}>
-              2016
-            </RangeSliderMark>
             <RangeSliderMark value={2017} {...labelStyles}>
               2017
             </RangeSliderMark>
