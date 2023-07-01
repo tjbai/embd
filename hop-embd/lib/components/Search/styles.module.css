@@ -20,8 +20,16 @@
     list-style-type: none;
 }
 
+.loader {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: 2px solid rgb(147, 144, 144);
+    height: 170px;
+    animation: pulse 2s infinite;
+}
+
 .queryItemWrapper {
-    border: 1px solid green;
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
@@ -128,5 +136,23 @@
         margin-top: 2px;
         font-size: 17px;
         line-height: 25px;
+    }
+
+    .loader {
+        height: 140px;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        background-color: transparent;
+    }
+
+    50% {
+        background-color: rgba(62, 62, 62, 0.75);
+    }
+
+    100% {
+        background-color: transparent;
     }
 }

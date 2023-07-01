@@ -1,31 +1,9 @@
 "use client";
 
 import SearchBar from "@/lib/components/Search/SearchBar";
-import {
-  Flex,
-  Icon,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Text,
-} from "@chakra-ui/react";
-import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
-import { BsSearch } from "react-icons/bs";
+import { Flex, Text } from "@chakra-ui/react";
 
 export default function Home() {
-  const [query, setQuery] = useState("");
-  const router = useRouter();
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    router.push(`/search?q=${query}`);
-  };
-
-  const handleMouseSubmit = () => {
-    router.push(`/search?q=${query}`);
-  };
-
   return (
     <Flex
       height="fit-content"
@@ -48,7 +26,6 @@ export default function Home() {
       >
         Deep course search at Johns Hopkins
       </Text>
-
       <SearchBar smaller />
     </Flex>
   );

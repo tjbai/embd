@@ -8,14 +8,12 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Spinner,
 } from "@chakra-ui/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { IoMdOptions } from "react-icons/io";
-
-const TERMS = ["Fall", "Intersession", "Spring"];
-const YEARS = [2023, 2022, 2021, 2020, 2019, 2018, 2017];
 
 export default function SearchBar({ smaller }: { smaller?: boolean }) {
   const searchParams = useSearchParams();
@@ -23,15 +21,24 @@ export default function SearchBar({ smaller }: { smaller?: boolean }) {
 
   const [query, setQuery] = useState(searchParams.get("q") ?? undefined);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (loading && query === searchParams.get("q")) {
+      setLoading(false);
+    }
+  }, [query, searchParams]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (query === searchParams.get("q")) return;
+    setLoading(true);
     router.push(`/search?q=${query}`);
   };
 
   const handleMouseSubmit = () => {
     if (query === searchParams.get("q")) return;
+    setLoading(true);
     router.push(`/search?q=${query}`);
   };
 
@@ -61,9 +68,12 @@ export default function SearchBar({ smaller }: { smaller?: boolean }) {
             placeholder="Show me courses about..."
             fontSize={{ base: "15px", md: "20px" }}
             _focus={{ boxShadow: "none" }}
-            onSubmit={() => console.log("input")}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              if (!loading) setQuery(e.target.value);
+            }}
+            disabled={loading}
+            _disabled={{ bg: "lightgrey" }}
           />
           <InputRightElement
             h={{ base: "40px", md: "50px" }}
@@ -74,11 +84,19 @@ export default function SearchBar({ smaller }: { smaller?: boolean }) {
             onClick={query?.length ? handleMouseSubmit : () => {}}
             _hover={{ cursor: query?.length ? "pointer" : "auto" }}
           >
-            <Icon
-              color={query?.length ? "white" : "black"}
-              fontSize={{ base: "17px", md: "25px" }}
-              as={BsSearch}
-            />
+            {loading ? (
+              <Spinner
+                size={{ base: "sm", md: "md" }}
+                color="white"
+                thickness="2px"
+              />
+            ) : (
+              <Icon
+                color={query?.length ? "white" : "black"}
+                fontSize={{ base: "17px", md: "25px" }}
+                as={BsSearch}
+              />
+            )}
           </InputRightElement>
         </InputGroup>
 

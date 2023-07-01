@@ -1,4 +1,5 @@
 import DisplayScreen from "@/lib/components/Search/DisplayScreen";
+import LoadingScreen from "@/lib/components/Search/LoadingScreen";
 import { redirect } from "next/navigation";
 import { isArray } from "util";
 
