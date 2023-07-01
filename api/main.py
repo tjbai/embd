@@ -19,12 +19,12 @@ def read_root():
 
 
 @app.get("/search/")
-def search(q: str = None):
+def search(q: str = None, s: int = None, e: int = None):
     if q is None:
         return {"Error": "Query not provided"}
 
     start_t = datetime.now()
-    courses = retrieve_rerank([q])[0]
+    courses = retrieve_rerank([q], s, e)[0]
     end_t = datetime.now()
 
     return {

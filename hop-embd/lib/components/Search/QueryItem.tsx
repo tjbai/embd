@@ -12,7 +12,7 @@ export default function QueryItem({
       <li className={styles.queryItemWrapper}>
         <text className={styles.courseTitle}>{courseWrapper.course.title}</text>
         <div className={styles.metadataContainer}>
-          <text className={styles.metadata}>
+          <text className={styles.creditsMetadata}>
             {courseWrapper.course.credits}
           </text>
           <div className={styles.bar} />

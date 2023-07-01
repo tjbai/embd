@@ -6,26 +6,27 @@ import { Flex, Text } from "@chakra-ui/react";
 export default function Home() {
   return (
     <Flex
-      height="fit-content"
-      top="30%"
-      transform="translate(0%, -30%)"
+      top={{ base: "50%", md: "45%" }}
+      transform={{ base: "translate(0%, -40%)", md: "translate(0%, -45%)" }}
+      height="calc(100svh - 45%)"
       position="relative"
       align="center"
       direction="column"
     >
       <Text
-        fontSize={{ base: "45px", md: "6vw" }}
-        lineHeight={{ base: "50px", md: "6.5vw" }}
+        fontSize={{ base: "40px", md: "70px", lg: "90px" }}
+        lineHeight={{ base: "40px", md: "75px", lg: "100px" }}
         textAlign="center"
         w="100%"
-        maxW={{ base: "70%", md: "min(70%, 1200px)" }}
+        maxW={{ base: "80%", md: "min(75%, 1000px)" }}
         bgClip="text"
         bgGradient="linear(to-tl, #75878a 10%, #ffffff 60%)"
-        letterSpacing="-0.2vw"
+        letterSpacing={{ base: "-0px", md: "-2px", lg: "-3px" }}
         mb="4vh"
       >
         Deep course search at Johns Hopkins
       </Text>
+
       <SearchBar smaller />
     </Flex>
   );

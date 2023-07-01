@@ -1,5 +1,5 @@
 .pageWrapper {
-    --page-top: 10%;
+    --page-top: 50px;
     position: absolute;
     top: var(--page-top);
     left: 0;
@@ -12,6 +12,7 @@
 }
 
 .resultsWrapper {
+    padding-top: 50px;
     display: flex;
     flex-direction: column;
     width: min(90%, 1000px);
@@ -22,7 +23,10 @@
 
 @media (max-width: 768px) {
     .pageWrapper {
-        top: 10%;
-        height: calc(100% - 10%)
+        --page-top: 40px;
+    }
+
+    .resultsWrapper {
+        padding-top: 40px
     }
 }

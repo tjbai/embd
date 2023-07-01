@@ -1,5 +1,5 @@
 .pageWrapper {
-    --page-top: 15%;
+    --page-top: 10%;
     position: absolute;
     top: var(--page-top);
     left: 0;
@@ -16,7 +16,7 @@
     flex-direction: column;
     width: min(90%, 1000px);
     max-height: 100%;
-    overflow-y: scroll;
+    overflow-y: scroll; 
     list-style-type: none;
 }
 
@@ -74,14 +74,26 @@
     margin: 10px;
 }
 
-.metadata {
+.creditsMetadata {
     color: white;
     font-weight: bold;
     font-size: 20px;
     line-height: 30px;
 }
 
+.metadata {
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 30px;
+    text-align: center;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 70%;
+}
+
 .factoidWrapper {
+    margin-top: 30px;
     margin-bottom: 10px;
     padding-left: 10px;
 }
@@ -110,6 +122,10 @@
 }
 
 @media (max-width: 768px) {
+    .factoid {
+        font-size: 15px;
+    }
+
     .pageWrapper {
         top: 10%;
         height: calc(100% - 10%)
@@ -120,7 +136,7 @@
         line-height: 24px;
     }
 
-    .metadata {
+    .metadata, .creditsMetadata {
         font-size: 17px;
         line-height: 22px;
         margin-top: 2px;
@@ -130,6 +146,8 @@
 
     .bar {
         margin: 5px;
+        position: relative;
+        top: 2px;
     }
 
     .description {

@@ -2,25 +2,43 @@
 
 import {
   Button,
+  Collapse,
+  filter,
   Flex,
   Icon,
   Input,
   InputGroup,
   InputRightElement,
+  RangeSlider,
+  RangeSliderFilledTrack,
+  RangeSliderMark,
+  RangeSliderThumb,
+  RangeSliderTrack,
   Spinner,
 } from "@chakra-ui/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { IoMdOptions } from "react-icons/io";
-import { useMContext } from "../Modals/MProvider";
+
+const labelStyles = {
+  mt: "5px",
+  ml: "-5px",
+  color: "white",
+  transform: "rotate(-50deg)",
+  fontSize: { base: "10px", md: "15px" },
+  fontWeight: "bold",
+};
+
+const defaultFilter = [2016, 2023];
 
 export default function SearchBar({ smaller }: { smaller?: boolean }) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { optionsOpen, setOptionsOpen } = useMContext();
 
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const [query, setQuery] = useState(searchParams.get("q") ?? undefined);
+  const [filter, setFilter] = useState(defaultFilter);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -33,17 +51,23 @@ export default function SearchBar({ smaller }: { smaller?: boolean }) {
     e.preventDefault();
     if (query === searchParams.get("q")) return;
     setLoading(true);
-    router.push(`/search?q=${query}`);
+    setOptionsOpen(false);
+    if (filter[0] === defaultFilter[0] && filter[1] === defaultFilter[1])
+      router.push(`/search?q=${query}`);
+    else router.push(`/search?q=${query}&s=${filter[0]}&e=${filter[1]}`);
   };
 
   const handleMouseSubmit = () => {
     if (query === searchParams.get("q")) return;
     setLoading(true);
-    router.push(`/search?q=${query}`);
+    setOptionsOpen(false);
+    if (filter[0] === defaultFilter[0] && filter[1] === defaultFilter[1])
+      router.push(`/search?q=${query}`);
+    else router.push(`/search?q=${query}&s=${filter[0]}&e=${filter[1]}`);
   };
 
   return (
-    <Flex w="100%" justify="center" align="center" mb="30px" direction="column">
+    <Flex w="100%" justify="center" align="center" direction="column">
       <form
         style={
           smaller
@@ -51,11 +75,13 @@ export default function SearchBar({ smaller }: { smaller?: boolean }) {
                 display: "flex",
                 justifyContent: "center",
                 width: "min(70%, 1000px)",
+                boxShadow: "0 2px 4px rgba(0,0,0,1)",
               }
             : {
                 display: "flex",
                 justifyContent: "center",
                 width: "min(90%, 1000px)",
+                boxShadow: "0 5px 30px rgba(0,0,0,1)",
               }
         }
         onSubmit={query?.length ? handleSubmit : () => {}}
@@ -115,6 +141,66 @@ export default function SearchBar({ smaller }: { smaller?: boolean }) {
           <Icon as={IoMdOptions} fontSize={{ base: "17px", md: "25px" }} />
         </Button>
       </form>
+
+      <Collapse in={optionsOpen} animateOpacity>
+        <Flex
+          maxW="100vw"
+          width={smaller ? "min(70vw, 1000px)" : "min(90vw, 1000px)"}
+          borderRadius="5px"
+          bg="transparent"
+          px={{ base: "20px", md: "40px" }}
+          pb="30px"
+          mt="30px"
+          direction="column"
+          justify="center"
+          h="40px"
+        >
+          <RangeSlider
+            min={defaultFilter[0]}
+            max={defaultFilter[1]}
+            step={1}
+            defaultValue={filter}
+            onChangeEnd={(v) => setFilter(v)}
+          >
+            <RangeSliderTrack bg="#F7FAFC" h={{ base: "5px", md: "10px" }}>
+              <RangeSliderFilledTrack bg="#0072CE" />
+            </RangeSliderTrack>
+            <RangeSliderThumb
+              boxSize={{ base: "10px", md: "20px" }}
+              index={0}
+            />
+            <RangeSliderThumb
+              boxSize={{ base: "10px", md: "20px" }}
+              index={1}
+            />
+
+            <RangeSliderMark value={2016} {...labelStyles}>
+              2016
+            </RangeSliderMark>
+            <RangeSliderMark value={2017} {...labelStyles}>
+              2017
+            </RangeSliderMark>
+            <RangeSliderMark value={2018} {...labelStyles}>
+              2018
+            </RangeSliderMark>
+            <RangeSliderMark value={2019} {...labelStyles}>
+              2019
+            </RangeSliderMark>
+            <RangeSliderMark value={2020} {...labelStyles}>
+              2020
+            </RangeSliderMark>
+            <RangeSliderMark value={2021} {...labelStyles}>
+              2021
+            </RangeSliderMark>
+            <RangeSliderMark value={2022} {...labelStyles}>
+              2022
+            </RangeSliderMark>
+            <RangeSliderMark value={2023} {...labelStyles}>
+              2023
+            </RangeSliderMark>
+          </RangeSlider>
+        </Flex>
+      </Collapse>
     </Flex>
   );
 }

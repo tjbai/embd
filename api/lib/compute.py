@@ -1,8 +1,10 @@
+import json
 from datetime import datetime
 from typing import Dict, List, Tuple, Union
 
+import numpy as np
 from annoy import AnnoyIndex
-from sentence_transformers import SentenceTransformer, CrossEncoder
+from sentence_transformers import CrossEncoder, SentenceTransformer
 
 from lib.models import DB, Course, CourseWrapper
 
@@ -39,24 +41,64 @@ def create_hit_map(ids: List[int]) -> Dict[int, CourseWrapper]:
     return {row[0]: CourseWrapper(*(row[1:-1])) for row in rows}
 
 
-def semantic_search(prompts: List[str]) -> List[Dict[int, CourseWrapper]]:
+def semantic_search(
+    prompts: List[str], start: int = None, end: int = None
+) -> List[Dict[int, CourseWrapper]]:
     query_embds = compute_query_embeddings(prompts)
     print(f"\n>>> calculated query embeddings {datetime.now()}")
 
-    u = AnnoyIndex(len(query_embds[0]), "dot")
-    u.load(INDEX_PATH)
-
     hit_maps = []
-    for query_embedding in query_embds:
-        hits = u.get_nns_by_vector(query_embedding, CANDIDATE_POOL_SIZE)
-        hit_maps.append(create_hit_map(hits))
+
+    # very slow
+    if start and end:
+        matching_semesters = {
+            f"{term} {yr}"
+            for term in ["Fall", "Intersession", "Spring"]
+            for yr in range(start, end + 1)
+        }
+
+        with DB(DB_PATH) as db:
+            courses = db.execute("""SELECT * FROM CourseWrappers""")
+
+        matching_courses = []
+        matching_embeddings = []
+        for course in courses:
+            terms = course[1].split(", ")
+            for t in terms:
+                if t in matching_semesters:
+                    matching_courses.append((course[0], CourseWrapper(*course[1:-1])))
+                    matching_embeddings.append(np.array(json.loads(course[-1])))
+
+        np_matching_embeddings = np.array(matching_embeddings)
+        for query_embedding in query_embds:
+            np_query_embedding = np.array(query_embedding)
+            inner_products = np.dot(np_matching_embeddings, np_query_embedding)
+            closest_indices = np.argsort(inner_products)[-100:]
+            hit_maps.append(
+                {
+                    matching_courses[index][0]: matching_courses[index][1]
+                    for index in closest_indices
+                }
+            )
+
+    else:
+        u = AnnoyIndex(len(query_embds[0]), "dot")
+        u.load(INDEX_PATH)
+
+        for query_embedding in query_embds:
+            hits = u.get_nns_by_vector(query_embedding, CANDIDATE_POOL_SIZE)
+            hit_maps.append(create_hit_map(hits))
 
     return hit_maps
 
 
-def retrieve_rerank(prompts: List[str]) -> List[List[Tuple[int, CourseWrapper]]]:
+def retrieve_rerank(
+    prompts: List[str], start: int = None, end: int = None
+) -> List[List[Tuple[int, CourseWrapper]]]:
     cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L-2")
-    semantic_cands: List[Dict[int, CourseWrapper]] = semantic_search(prompts)
+    semantic_cands: List[Dict[int, CourseWrapper]] = semantic_search(
+        prompts, start=start, end=end
+    )
     print(f"\n>>> retrieved hits {datetime.now()}")
 
     res = []
