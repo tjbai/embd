@@ -2,7 +2,7 @@
     display: flex;
     width: 100%;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .question {
@@ -13,13 +13,12 @@
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
-    margin-bottom: 10px;
 }
 
 .answer {
     font-size: 25px;
     line-height: 30px;
-    color: #e6e7e9;
+    color: #adaeb0;
     margin-bottom: 10px;
 }
 
@@ -31,6 +30,6 @@
     }
 
     .answer {
-        font-size: 16px;
+        font-size: 20px;
     }
 }

@@ -2,7 +2,6 @@
 
 import {
   Button,
-  Collapse,
   Flex,
   Icon,
   Input,
@@ -14,13 +13,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { IoMdOptions } from "react-icons/io";
+import { useMContext } from "../Modals/MProvider";
 
 export default function SearchBar({ smaller }: { smaller?: boolean }) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { optionsOpen, setOptionsOpen } = useMContext();
 
   const [query, setQuery] = useState(searchParams.get("q") ?? undefined);
-  const [optionsOpen, setOptionsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -115,8 +115,6 @@ export default function SearchBar({ smaller }: { smaller?: boolean }) {
           <Icon as={IoMdOptions} fontSize={{ base: "17px", md: "25px" }} />
         </Button>
       </form>
-
-      <Collapse in={optionsOpen} animateOpacity></Collapse>
     </Flex>
   );
 }

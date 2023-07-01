@@ -1,5 +1,5 @@
 .pageWrapper {
-    --page-top: 15%;
+    --page-top: 10%;
     position: absolute;
     top: var(--page-top);
     left: 0;

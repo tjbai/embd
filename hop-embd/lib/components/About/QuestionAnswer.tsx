@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import styles from "./styles.module.css";
 
 export default function QuestionAnswer({
@@ -5,7 +6,7 @@ export default function QuestionAnswer({
   answer,
 }: {
   question: string;
-  answer: string;
+  answer: string | ReactNode;
 }) {
   return (
     <section className={styles.wrapper}>
