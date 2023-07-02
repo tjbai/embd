@@ -17,7 +17,7 @@ export default function Factoid({
       <div className={styles.factoidWrapper}>
         <text className={styles.factoid}>
           {`Fetched ${queryResults.courses.length} courses between ${start} and ${end}` +
-            ` in ${queryResults.time} seconds related to "${query}"`}
+            ` in ${queryResults.time} seconds"`}
         </text>
       </div>
     );
@@ -27,7 +27,7 @@ export default function Factoid({
     <div className={styles.factoidWrapper}>
       <text className={styles.factoid}>
         {`Fetched ${queryResults.courses.length} courses` +
-          ` in ${queryResults.time} seconds related to "${query}"`}
+          ` in ${queryResults.time} seconds"`}
       </text>
     </div>
   );

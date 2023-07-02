@@ -8,7 +8,7 @@ export default function Header() {
   return (
     <Flex
       w="100%"
-      maxW="min(95%, 1200px)"
+      maxW="min(90%, 1200px)"
       position="fixed"
       borderBottom="1.5px solid"
       borderColor="#787777"

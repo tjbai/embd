@@ -93,6 +93,8 @@
 }
 
 .factoidWrapper {
+    max-width: 100%;
+    overflow: hidden;
     margin-top: 30px;
     margin-bottom: 10px;
     padding-left: 10px;
@@ -100,8 +102,8 @@
 
 .factoid {
     color: white;
-    white-space: nowrap;
-    overflow: hidden;
+    /* white-space: nowrap; */
+    /* overflow: hidden; */
     text-overflow: ellipsis;
 }
 
