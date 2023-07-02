@@ -1,7 +1,19 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 4 version
+*/
+
 .wrapper {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
     width: 100%;
-    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
     margin-bottom: 30px;
 }
 
@@ -9,6 +21,8 @@
     font-weight: bold;
     font-size: 40px;
     line-height: 45px;
+    background: -webkit-gradient(linear, right bottom, left top, color-stop(10%, #75878a), color-stop(75%, #ffffff));
+    background: -o-linear-gradient(right bottom, #75878a 10%, #ffffff 75%);
     background: linear-gradient(to left top, #75878a 10%, #ffffff 75%);
     background-clip: text;
     -webkit-background-clip: text;
