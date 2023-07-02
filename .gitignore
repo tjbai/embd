@@ -12,3 +12,4 @@ api/__pycache__/**
 *.db
 *.ann
 *.DS_Store
+*.ipynb
